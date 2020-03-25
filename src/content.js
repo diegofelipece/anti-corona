@@ -1,3 +1,5 @@
+import uid from 'uid'
+
 const validateLang = (lang) => (
   (lang === 'pt-BR' || lang === 'pt' || lang === 'pt-br')
     ? 'pt-BR' : null
