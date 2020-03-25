@@ -11,7 +11,59 @@ class AvoidingCorona {
     this.searchableNodes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'figcaption', 'a', 'span', 'strong', 'div']
     this.messages = {
       'pt-BR': {
-        placeholder: 'Frescura',
+        placeholder: {
+          quote: 'Frescura',
+          gender: 'f', // f, m, n
+          // quote: 'Delírio coletivo',
+          // gender: 'm', // f, m, n
+        },
+        oppositeGenderMap: {
+          m: 'f',
+          f: 'm',
+        },
+        genderRegex: {
+          m: /os*$/gm,
+          f: /as*$/gm,
+        },
+        blacklist: {
+          novo: '',
+        },
+        prepsAndArticles: {
+          m: {
+            o: 'a',
+            os: 'as',
+            ao: 'as',
+            aos: 'as',
+            do: 'da',
+            dos: 'das',
+            no: 'na',
+            nos: 'nas',
+            pelo: 'pela',
+            pelos: 'pelas',
+            num: 'numa',
+            nuns: 'numas',
+          },
+          f: {
+            a: 'o',
+            as: 'os',
+            à: 'ao',
+            às: 'aos',
+            da: 'do',
+            das: 'dos',
+            na: 'no',
+            nas: 'nos',
+            pela: 'pelo',
+            pelas: 'pelos',
+            numas: 'nums',
+            numa: 'num',
+          },
+          n: {
+            de: 'de',
+            por: 'por',
+            e: 'e',
+            ou: 'ou',
+          },
+        },
       },
     }
   }
@@ -24,9 +76,41 @@ class AvoidingCorona {
     return (language && msgs) ? msgs : null
   }
 
+  replaceText(anchor, string) {
+    const {
+      placeholder, prepsAndArticles, oppositeGenderMap, genderRegex,
+    } = this.langMessages
+    const { quote, gender } = placeholder
+    const oppositeGender = oppositeGenderMap[gender]
+
+    const startsWithAnchor = !string.replace(/^\W*/, '').search(anchor)
+
+    if (startsWithAnchor) return string.replace(anchor, quote)
+
+    const stringArray = string.replace(/[,."';:]/g, '').split(/\s/).filter((x) => x)
+    const anchorIndex = stringArray.indexOf(anchor)
+    const wordBefore = stringArray[anchorIndex - 1]
+
+    const matchGender = prepsAndArticles[gender][wordBefore]
+    if (matchGender) return string.replace(anchor, quote)
+
+    const matchOtheGenders = (
+      prepsAndArticles[oppositeGender][wordBefore] || prepsAndArticles.n[wordBefore]
+    )
+    if (matchOtheGenders) return string.replace(`${wordBefore} ${anchor}`, `${matchOtheGenders} ${quote}`)
+
+    const wordMatchGender = genderRegex[gender].exec(wordBefore)
+    if (wordMatchGender) return string.replace(anchor, quote)
+
+    // TODO: "novo" and other special cases
+    // console.log('replaceText > stringArray', stringArray)
+    // console.log('replaceText > wordBefore', wordBefore)
+    // console.log('replaceText > beforeWordBefore', stringArray[anchorIndex - 2])
+
+    return string.replace(anchor, quote)
+  }
+
   changeNode(node) {
-    // console.log('getNodeList', node.coronaUid)
-    const { placeholder } = this.langMessages
     if (!node.coronaUid) {
       const newId = uid()
       node.coronaUid = newId // eslint-disable-line no-param-reassign
@@ -42,7 +126,7 @@ class AvoidingCorona {
           )
           if (matchedStrings.length) {
             for (const matchedString of matchedStrings) {
-              text = text.replace(matchedString, placeholder)
+              text = this.replaceText(matchedString, text)
             }
             childNode.textContent = text // eslint-disable-line no-param-reassign
           }
