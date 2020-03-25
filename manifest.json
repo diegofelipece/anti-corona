@@ -1,0 +1,17 @@
+{
+    "name": "Avoiding Corona",
+    "version": "1.0",
+    "description": "No more 'Corona' on your web.",
+    "content_scripts": [{
+        "matches": ["*://*/*"],
+        "js": ["dist/content.js"],
+        "run_at": "document_end",
+        "all_frames": true
+    }],
+    "background": {
+      "scripts": ["dist/background.js"],
+      "persistent": false
+    },
+    "permissions": ["declarativeContent"],
+    "manifest_version": 2
+}
