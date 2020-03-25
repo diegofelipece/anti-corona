@@ -8,7 +8,7 @@ const validateLang = (lang) => (
 class AvoidingCorona {
   constructor() {
     this.nodes = {}
-    this.searchableNodes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p']
+    this.searchableNodes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'figcaption', 'a', 'span']
     this.messages = {
       'pt-BR': {
         placeholder: 'Frescura',
@@ -24,39 +24,45 @@ class AvoidingCorona {
     return (language && msgs) ? msgs : null
   }
 
-  appendNode(node) {
-    // console.log('updateNodeList', node.coronaUid)
+  changeNode(node) {
+    // console.log('getNodeList', node.coronaUid)
     const { placeholder } = this.langMessages
-
     if (!node.coronaUid) {
+
       const newId = uid()
       node.coronaUid = newId // eslint-disable-line no-param-reassign
       this.nodes[newId] = node
 
-      let text = node.innerText
-      const matchArray = text.match(/(corona(\s*)v[í,i]rus)*(covid([-, /s])*19)*/gi)
-      const matchedStrings = matchArray.filter(
-        (match, index) => match && matchArray.indexOf(match) === index,
-      )
-
-      if (matchedStrings.length) {
-        for (const matchedString of matchedStrings) {
-          text = text.replace(matchedString, placeholder)
+      const { childNodes } = node
+      for (const childNode of childNodes) {
+        if (childNode.nodeName === '#text') {
+          let text = childNode.textContent
+          const matchArray = text.match(/(corona(\s*)v[í,i]rus)*(covid([-, /s])*19)*/gi)
+          const matchedStrings = matchArray.filter(
+            (match, index) => match && matchArray.indexOf(match) === index,
+          )
+          if (matchedStrings.length) {
+            for (const matchedString of matchedStrings) {
+              text = text.replace(matchedString, placeholder)
+            }
+            childNode.textContent = text // eslint-disable-line no-param-reassign
+          }
         }
-        node.innerText = text // eslint-disable-line no-param-reassign
       }
     }
   }
 
-  updateNodeList() {
+  getNodeList() {
     const nodes = document.querySelectorAll(this.searchableNodes.join(','))
-    nodes.forEach((node) => this.appendNode(node))
+    nodes.forEach((node) => {
+      this.changeNode(node)
+    })
   }
 
   onDomChanges(mutationsList) {
     for (const mutation of mutationsList) {
       if (mutation.addedNodes) {
-        this.updateNodeList()
+        this.getNodeList()
       }
     }
   }
