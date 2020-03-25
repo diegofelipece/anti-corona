@@ -7,7 +7,7 @@ const validateLang = (lang) => (
 
 class AvoidingCorona {
   constructor() {
-    this.nodes = []
+    this.nodes = {}
     this.searchableNodes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p']
     this.messages = {
       'pt-BR': {
@@ -25,36 +25,32 @@ class AvoidingCorona {
   }
 
   appendNode(node) {
-    // check if node has corona_UID and if this id is present on nodeList
-    // if not append corona_UID to node object and set it on node list
+    // console.log('updateNodeList', node.coronaUid)
+    const { placeholder } = this.langMessages
+
+    if (!node.coronaUid) {
+      const newId = uid()
+      node.coronaUid = newId // eslint-disable-line no-param-reassign
+      this.nodes[newId] = node
+
+      let text = node.innerText
+      const matchArray = text.match(/(corona(\s*)v[í,i]rus)*(covid([-, /s])*19)*/gi)
+      const matchedStrings = matchArray.filter(
+        (match, index) => match && matchArray.indexOf(match) === index,
+      )
+
+      if (matchedStrings.length) {
+        for (const matchedString of matchedStrings) {
+          text = text.replace(matchedString, placeholder)
+        }
+        node.innerText = text // eslint-disable-line no-param-reassign
+      }
+    }
   }
 
-  // filterCoronaNodes(nodes) {
-  //   const { placeholder } = this.langMessages
-
-  //   for (const node of nodes) {
-  //     let text = node.innerText
-
-  //     // TODO: remove all graphs and make it case insensetive
-  //     console.log(text)
-  //     text = text
-  //       .replace(/coronavírus/ig, placeholder)
-  //       .replace(/coronavirus/ig, placeholder)
-  //       .replace(/covid-19/ig, placeholder)
-
-  //     console.log('node', text)
-  //     node.innerText = text
-  //   }
-  // }
-
   updateNodeList() {
-    console.log('updateNodeList', this.nodes)
-
     const nodes = document.querySelectorAll(this.searchableNodes.join(','))
-    console.log('updateNodeList', nodes)
-    // console.log('lang', langMessages)
-    // const coronaNodes = this.filterCoronaNodes(nodes)
-    // console.log('coronaNodes', coronaNodes)
+    nodes.forEach((node) => this.appendNode(node))
   }
 
   onDomChanges(mutationsList) {
@@ -67,7 +63,7 @@ class AvoidingCorona {
 
   init() {
     const { langMessages } = this
-    console.log('langMessages', langMessages)
+    // console.log('langMessages', langMessages)
 
     if (langMessages) {
       // @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
