@@ -8,7 +8,7 @@ const validateLang = (lang) => (
 class AvoidingCorona {
   constructor() {
     this.nodes = {}
-    this.searchableNodes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'figcaption', 'a', 'span']
+    this.searchableNodes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'figcaption', 'a', 'span', 'strong', 'div']
     this.messages = {
       'pt-BR': {
         placeholder: 'Frescura',
@@ -28,7 +28,6 @@ class AvoidingCorona {
     // console.log('getNodeList', node.coronaUid)
     const { placeholder } = this.langMessages
     if (!node.coronaUid) {
-
       const newId = uid()
       node.coronaUid = newId // eslint-disable-line no-param-reassign
       this.nodes[newId] = node
