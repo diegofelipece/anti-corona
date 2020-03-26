@@ -29,16 +29,16 @@ class AvoidingCorona {
       'pt-BR': {
         placeholder: [
           {
-            quote: '~Frescura~',
+            quote: '~frescura~',
             gender: 'f',
           }, {
-            quote: '~Gripizinha~',
+            quote: '~gripezinha~',
             gender: 'f',
           }, {
-            quote: '~Histeria~',
+            quote: '~histeria~',
             gender: 'f',
           }, {
-            quote: '~Delírio coletivo~',
+            quote: '~delírio coletivo~',
             gender: 'm',
           },
         ],
