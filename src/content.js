@@ -182,7 +182,8 @@ class AvoidingCorona {
 
   init() {
     const { langMessages } = this
-    // console.log('langMessages', langMessages)
+
+    this.getNodeList()
 
     if (langMessages) {
       // @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver

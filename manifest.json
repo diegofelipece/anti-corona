@@ -7,12 +7,9 @@
       "48": "icons/anticorona-48.png",
       "128": "icons/anticorona-128.png"
     },
-    "content_scripts": [{
-      "matches": ["<all_urls>"],
-      "js": ["dist/content.js"],
-      "run_at": "document_end",
-      "all_frames": true
-    }],
+    "browser_action": {
+      "default_title": "Chega de corona!"
+    },
     "background": {
       "scripts": ["dist/background.js"],
       "persistent": false
