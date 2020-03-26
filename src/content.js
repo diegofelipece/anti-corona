@@ -128,11 +128,11 @@ class AvoidingCorona {
     const matchBlacklist = checkOnlist(blacklist[gender], string)
     if (matchBlacklist) return matchBlacklist.replace(anchor, quote)
 
-    const matchOtheGenders = (
+    const matchOtherGenders = (
       prepsAndArticles[oppositeGender][wordBefore]
       || prepsAndArticles.n[wordBefore]
     )
-    if (matchOtheGenders) return string.replace(new RegExp(`${wordBefore}/s*${anchor}`, 'gi'), `${matchOtheGenders} ${quote}`)
+    if (matchOtherGenders) return string.replace(new RegExp(`${wordBefore} ${anchor}`, 'gi'), `${matchOtherGenders} ${quote}`)
 
     const wordMatchGender = genderRegex[gender].exec(wordBefore)
     if (wordMatchGender) return string.replace(new RegExp(anchor, 'gi'), quote)
