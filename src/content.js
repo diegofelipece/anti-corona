@@ -21,16 +21,16 @@ class AvoidingCorona {
       'pt-BR': {
         placeholder: [
           {
-            quote: 'Frescura',
+            quote: '~Frescura~',
             gender: 'f',
           }, {
-            quote: 'Gripizinha',
+            quote: '~Gripizinha~',
             gender: 'f',
           }, {
             quote: '~Histeria~',
             gender: 'f',
           }, {
-            quote: 'Delírio coletivo',
+            quote: '~Delírio coletivo~',
             gender: 'm',
           },
         ],
@@ -101,7 +101,7 @@ class AvoidingCorona {
     const {
       placeholder, prepsAndArticles, oppositeGenderMap, genderRegex, blacklist,
     } = this.langMessages
-    const { quote, gender } = placeholder[2]
+    const { quote, gender } = placeholder[1]
     const oppositeGender = oppositeGenderMap[gender]
 
     const startsWithAnchor = !string.replace(/^\W*/, '').search(anchor)
@@ -109,21 +109,22 @@ class AvoidingCorona {
 
     const stringArray = string.replace(/[,."';:]/g, '').split(/\s/).filter((x) => x)
     const anchorIndex = stringArray.indexOf(anchor)
-    const wordBefore = stringArray[anchorIndex - 1]
+    const wordBefore = (stringArray[anchorIndex - 1] || '').toLowerCase()
 
     const matchGender = prepsAndArticles[gender][wordBefore]
-    if (matchGender) return string.replace(anchor, quote)
+    if (matchGender) return string.replace(new RegExp(anchor, 'gi'), quote)
 
     const matchBlacklist = checkOnlist(blacklist[gender], string)
     if (matchBlacklist) return matchBlacklist.replace(anchor, quote)
 
     const matchOtheGenders = (
-      prepsAndArticles[oppositeGender][wordBefore] || prepsAndArticles.n[wordBefore]
+      prepsAndArticles[oppositeGender][wordBefore]
+      || prepsAndArticles.n[wordBefore]
     )
-    if (matchOtheGenders) return string.replace(`${wordBefore} ${anchor}`, `${matchOtheGenders} ${quote}`)
+    if (matchOtheGenders) return string.replace(new RegExp(`${wordBefore}/s*${anchor}`, 'gi'), `${matchOtheGenders} ${quote}`)
 
     const wordMatchGender = genderRegex[gender].exec(wordBefore)
-    if (wordMatchGender) return string.replace(anchor, quote)
+    if (wordMatchGender) return string.replace(new RegExp(anchor, 'gi'), quote)
 
     return string.replace(anchor, quote)
   }
