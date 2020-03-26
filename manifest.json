@@ -1,7 +1,7 @@
 {
-    "name": "Avoiding Corona",
+    "name": "Anti-Corona",
     "version": "1.0",
-    "description": "No more 'Corona' on your web.",
+    "description": "No more coronavirus on your browser.",
     "content_scripts": [{
         "matches": ["*://*/*"],
         "js": ["dist/content.js"],

@@ -1,5 +1,5 @@
 {
-  "name": "avoiding-corona",
+  "name": "anti-corona",
   "version": "1.0.0",
   "description": "No more coronavirus on your browser.",
   "main": "content.js",
@@ -23,6 +23,7 @@
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-loader": "^3.0.3",
     "eslint-plugin-import": "^2.20.1",
+    "uid": "^1.0.0",
     "webpack": "^4.42.1"
   },
   "devDependencies": {
