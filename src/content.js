@@ -7,10 +7,10 @@ const validateLang = (lang) => (
 
 const checkOnlist = (list, string) => {
   const lowerString = string.toLowerCase()
-  const toReplace = Object.entries(list)
-    .find(([item]) => lowerString.indexOf(item.toLowerCase()) !== -1)
+  const [originalItem, toReplace] = Object.entries(list)
+    .find(([item]) => lowerString.indexOf(item.toLowerCase()) !== -1) || []
 
-  return toReplace && string.replace(...toReplace)
+  return originalItem && string.replace(new RegExp(originalItem, 'gi'), toReplace)
 }
 
 class AvoidingCorona {
