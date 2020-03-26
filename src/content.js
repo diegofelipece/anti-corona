@@ -5,6 +5,14 @@ const validateLang = (lang) => (
     ? 'pt-BR' : null
 )
 
+const checkOnlist = (list, string) => {
+  const lowerString = string.toLowerCase()
+  const toReplace = Object.entries(list)
+    .find(([item]) => lowerString.indexOf(item.toLowerCase()) !== -1)
+
+  return toReplace && string.replace(...toReplace)
+}
+
 class AvoidingCorona {
   constructor() {
     this.nodes = {}
@@ -35,13 +43,17 @@ class AvoidingCorona {
           f: /as*$/gm,
         },
         blacklist: {
-          novo: '',
+          m: {},
+          f: {
+            'o novo': 'a nova',
+            novo: 'nova',
+          },
         },
         prepsAndArticles: {
           m: {
             o: 'a',
             os: 'as',
-            ao: 'as',
+            ao: 'a',
             aos: 'as',
             do: 'da',
             dos: 'das',
@@ -87,7 +99,7 @@ class AvoidingCorona {
 
   replaceText(anchor, string) {
     const {
-      placeholder, prepsAndArticles, oppositeGenderMap, genderRegex,
+      placeholder, prepsAndArticles, oppositeGenderMap, genderRegex, blacklist,
     } = this.langMessages
     const { quote, gender } = placeholder[2]
     const oppositeGender = oppositeGenderMap[gender]
@@ -102,6 +114,9 @@ class AvoidingCorona {
     const matchGender = prepsAndArticles[gender][wordBefore]
     if (matchGender) return string.replace(anchor, quote)
 
+    const matchBlacklist = checkOnlist(blacklist[gender], string)
+    if (matchBlacklist) return matchBlacklist.replace(anchor, quote)
+
     const matchOtheGenders = (
       prepsAndArticles[oppositeGender][wordBefore] || prepsAndArticles.n[wordBefore]
     )
@@ -109,8 +124,6 @@ class AvoidingCorona {
 
     const wordMatchGender = genderRegex[gender].exec(wordBefore)
     if (wordMatchGender) return string.replace(anchor, quote)
-
-    // TODO: "novo" and other special cases
 
     return string.replace(anchor, quote)
   }
