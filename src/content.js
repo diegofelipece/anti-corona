@@ -13,6 +13,14 @@ const checkOnlist = (list, string) => {
   return originalItem && string.replace(new RegExp(originalItem, 'gi'), toReplace)
 }
 
+function getRandomInt(min, max) {
+  const minNum = Math.ceil(min)
+  const maxNum = Math.floor(max)
+
+  return Math.floor(Math.random() * (maxNum - minNum)) + minNum
+}
+
+
 class AvoidingCorona {
   constructor() {
     this.nodes = {}
@@ -101,7 +109,10 @@ class AvoidingCorona {
     const {
       placeholder, prepsAndArticles, oppositeGenderMap, genderRegex, blacklist,
     } = this.langMessages
-    const { quote, gender } = placeholder[1]
+
+    const placeholderIndex = getRandomInt(0, placeholder.length) || 0
+    const { quote, gender } = placeholder[placeholderIndex]
+
     const oppositeGender = oppositeGenderMap[gender]
 
     const startsWithAnchor = !string.replace(/^\W*/, '').search(anchor)
