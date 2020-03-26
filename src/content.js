@@ -8,15 +8,24 @@ const validateLang = (lang) => (
 class AvoidingCorona {
   constructor() {
     this.nodes = {}
-    this.searchableNodes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'figcaption', 'a', 'span', 'strong', 'div']
+    this.searchableNodes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'figcaption', 'a', 'span', 'strong', 'b', 'i', 'div']
     this.messages = {
       'pt-BR': {
-        placeholder: {
-          quote: 'Frescura',
-          gender: 'f', // f, m, n
-          // quote: 'Delírio coletivo',
-          // gender: 'm', // f, m, n
-        },
+        placeholder: [
+          {
+            quote: 'Frescura',
+            gender: 'f',
+          }, {
+            quote: 'Gripizinha',
+            gender: 'f',
+          }, {
+            quote: '~Histeria~',
+            gender: 'f',
+          }, {
+            quote: 'Delírio coletivo',
+            gender: 'm',
+          },
+        ],
         oppositeGenderMap: {
           m: 'f',
           f: 'm',
@@ -80,11 +89,10 @@ class AvoidingCorona {
     const {
       placeholder, prepsAndArticles, oppositeGenderMap, genderRegex,
     } = this.langMessages
-    const { quote, gender } = placeholder
+    const { quote, gender } = placeholder[2]
     const oppositeGender = oppositeGenderMap[gender]
 
     const startsWithAnchor = !string.replace(/^\W*/, '').search(anchor)
-
     if (startsWithAnchor) return string.replace(anchor, quote)
 
     const stringArray = string.replace(/[,."';:]/g, '').split(/\s/).filter((x) => x)
@@ -103,9 +111,6 @@ class AvoidingCorona {
     if (wordMatchGender) return string.replace(anchor, quote)
 
     // TODO: "novo" and other special cases
-    // console.log('replaceText > stringArray', stringArray)
-    // console.log('replaceText > wordBefore', wordBefore)
-    // console.log('replaceText > beforeWordBefore', stringArray[anchorIndex - 2])
 
     return string.replace(anchor, quote)
   }
