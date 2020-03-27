@@ -1,6 +1,6 @@
 {
   "name": "anti-corona",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "No more coronavirus on your browser.",
   "main": "content.js",
   "scripts": {
