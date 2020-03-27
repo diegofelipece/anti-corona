@@ -5,6 +5,22 @@ const validateLang = (lang) => (
     ? 'pt-BR' : null
 )
 
+const checkOnlist = (list, string) => {
+  const lowerString = string.toLowerCase()
+  const [originalItem, toReplace] = Object.entries(list)
+    .find(([item]) => lowerString.indexOf(item.toLowerCase()) !== -1) || []
+
+  return originalItem && string.replace(new RegExp(originalItem, 'gi'), toReplace)
+}
+
+function getRandomInt(min, max) {
+  const minNum = Math.ceil(min)
+  const maxNum = Math.floor(max)
+
+  return Math.floor(Math.random() * (maxNum - minNum)) + minNum
+}
+
+
 class AvoidingCorona {
   constructor() {
     this.nodes = {}
@@ -13,16 +29,16 @@ class AvoidingCorona {
       'pt-BR': {
         placeholder: [
           {
-            quote: 'Frescura',
+            quote: '~frescura~',
             gender: 'f',
           }, {
-            quote: 'Gripizinha',
+            quote: '~gripezinha~',
             gender: 'f',
           }, {
-            quote: '~Histeria~',
+            quote: '~histeria~',
             gender: 'f',
           }, {
-            quote: 'Delírio coletivo',
+            quote: '~delírio coletivo~',
             gender: 'm',
           },
         ],
@@ -35,13 +51,17 @@ class AvoidingCorona {
           f: /as*$/gm,
         },
         blacklist: {
-          novo: '',
+          m: {},
+          f: {
+            'o novo': 'a nova',
+            novo: 'nova',
+          },
         },
         prepsAndArticles: {
           m: {
             o: 'a',
             os: 'as',
-            ao: 'as',
+            ao: 'a',
             aos: 'as',
             do: 'da',
             dos: 'das',
@@ -87,9 +107,12 @@ class AvoidingCorona {
 
   replaceText(anchor, string) {
     const {
-      placeholder, prepsAndArticles, oppositeGenderMap, genderRegex,
+      placeholder, prepsAndArticles, oppositeGenderMap, genderRegex, blacklist,
     } = this.langMessages
-    const { quote, gender } = placeholder[2]
+
+    const placeholderIndex = getRandomInt(0, placeholder.length) || 0
+    const { quote, gender } = placeholder[placeholderIndex]
+
     const oppositeGender = oppositeGenderMap[gender]
 
     const startsWithAnchor = !string.replace(/^\W*/, '').search(anchor)
@@ -97,20 +120,22 @@ class AvoidingCorona {
 
     const stringArray = string.replace(/[,."';:]/g, '').split(/\s/).filter((x) => x)
     const anchorIndex = stringArray.indexOf(anchor)
-    const wordBefore = stringArray[anchorIndex - 1]
+    const wordBefore = (stringArray[anchorIndex - 1] || '').toLowerCase()
 
     const matchGender = prepsAndArticles[gender][wordBefore]
-    if (matchGender) return string.replace(anchor, quote)
+    if (matchGender) return string.replace(new RegExp(anchor, 'gi'), quote)
 
-    const matchOtheGenders = (
-      prepsAndArticles[oppositeGender][wordBefore] || prepsAndArticles.n[wordBefore]
+    const matchBlacklist = checkOnlist(blacklist[gender], string)
+    if (matchBlacklist) return matchBlacklist.replace(anchor, quote)
+
+    const matchOtherGenders = (
+      prepsAndArticles[oppositeGender][wordBefore]
+      || prepsAndArticles.n[wordBefore]
     )
-    if (matchOtheGenders) return string.replace(`${wordBefore} ${anchor}`, `${matchOtheGenders} ${quote}`)
+    if (matchOtherGenders) return string.replace(new RegExp(`${wordBefore} ${anchor}`, 'gi'), `${matchOtherGenders} ${quote}`)
 
     const wordMatchGender = genderRegex[gender].exec(wordBefore)
-    if (wordMatchGender) return string.replace(anchor, quote)
-
-    // TODO: "novo" and other special cases
+    if (wordMatchGender) return string.replace(new RegExp(anchor, 'gi'), quote)
 
     return string.replace(anchor, quote)
   }
@@ -157,7 +182,8 @@ class AvoidingCorona {
 
   init() {
     const { langMessages } = this
-    // console.log('langMessages', langMessages)
+
+    this.getNodeList()
 
     if (langMessages) {
       // @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
