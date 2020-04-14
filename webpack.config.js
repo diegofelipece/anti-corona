@@ -1,6 +1,7 @@
 const path = require('path')
 const ExtensionReloader = require('webpack-extension-reloader')
 const ExtensionManifestPlugin = require('webpack-extension-manifest-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const baseManifest = require('./src/manifest')
 const pkg = require('./package')
@@ -19,7 +20,6 @@ module.exports = (env, argv) => {
     entry: {
       content: `${PATHS.APP}/content.js`,
       background: `${PATHS.APP}/background.js`,
-      // images: `${PATHS.APP}/images`,
     },
     output: {
       path: PATHS.DIST,
@@ -62,6 +62,12 @@ module.exports = (env, argv) => {
           extend: { version: pkg.version },
         },
       }),
+      new CopyWebpackPlugin([
+        {
+          from: `${PATHS.APP}/images`,
+          to: `${PATHS.DIST}/images`,
+        },
+      ]),
     ],
   }
 
